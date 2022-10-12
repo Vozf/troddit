@@ -1,7 +1,7 @@
 # Troddit 
 ### _An alternative front end web client for Reddit_
 
-Live at [troddit.com](https://www.troddit.com)
+Selfhosted 
 
 
 ## Screenshots
