@@ -56,7 +56,7 @@ const Thread = ({
   commentsDirect = false,
   direct = false,
   goBack = () => {},
-  setCurPost
+  setCurPost,
 }) => {
   const context: any = useMainContext();
   const { data: session, status } = useSession();
@@ -337,6 +337,7 @@ const Thread = ({
                     imgFull={mediaInfo?.isSelf ? true : imgFull}
                     postMode={true}
                     containerDims={[pWidth, pHeight]}
+                    showCrossPost={false}
                   />
                 </div>
               )}
@@ -506,6 +507,18 @@ const Thread = ({
                         </div>
                       </>
                     )}
+                    {usePortrait && post?.crosspost_parent_list?.[0] && (
+                      <div className={"block relative md:ml-3 "}>
+                        <MediaWrapper
+                          hideNSFW={hideNSFW}
+                          post={initPost}
+                          forceMute={false}
+                          imgFull={imgFull}
+                          postMode={true}
+                          showCrossPostMedia={false}
+                        />
+                      </div>
+                    )}
                     {/* Bottom Buttons */}
 
                     <div className="flex flex-row flex-wrap items-center justify-end mt-2 space-x-1 select-none md:justify-between">
@@ -541,18 +554,14 @@ const Thread = ({
                             aria-label="full screen media"
                             autoFocus={windowWidth < 1300}
                             onClick={() => {
-                              if (mediaInfo?.isSelf && false) {
-                                setimgFull((p) => !p);
-                              } else {
-                                setMediaMode(true);
-                              }
+                              setMediaMode(true);
                             }}
                             className="flex flex-row items-center p-2 border rounded-md border-th-border hover:border-th-borderHighlight"
                           >
                             <BiExpand className={"flex-none w-5 h-5 "} />
                           </button>
                         )}
-                        {mediaInfo?.isSelf && (
+                        {mediaInfo?.isSelf && post?.selftext_html && (
                           <button
                             onClick={() => setimgFull((p) => !p)}
                             aria-label="expand text"
@@ -654,7 +663,7 @@ const Thread = ({
                           target="_blank"
                           rel="noreferrer"
                         >
-                          <div className="flex flex-row items-center p-2 space-x-1 border rounded-md border-th-border hover:border-th-borderHighlight ">
+                          <div className="flex-row items-center hidden p-2 space-x-1 border rounded-md sm:flex border-th-border hover:border-th-borderHighlight ">
                             <ImReddit
                               className={
                                 "flex-none w-5 h-5 " +

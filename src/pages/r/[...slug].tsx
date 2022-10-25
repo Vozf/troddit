@@ -133,7 +133,7 @@ const SubredditPage = ({ query, metaTags, post, postData }) => {
               commentMode={commentThread}
               withcontext={withCommentContext}
               postData={post}
-              postNum={undefined}
+              postNum={0}
               curKey={undefined}
             />
           </div>
@@ -178,7 +178,10 @@ SubredditPage.getInitialProps = async (d) => {
         tokenData,
         subreddits,
         query?.slug?.[1] ?? "hot",
-        query?.t ?? "all"
+        query?.t ?? "all",
+        "",
+        0,
+        true
       );
       posts = data?.children;
     };
