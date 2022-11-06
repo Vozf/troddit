@@ -22,6 +22,7 @@ const processingInstructions = [
         node.parent.name &&
         node.parent.name === "a" &&
         node.parent?.attribs?.href?.includes("https://") &&
+        checkSupport(node.parent?.attribs?.href, node) &&
         node.name !== "img"; //leave comment gifs alone
       return check;
     },
@@ -37,6 +38,22 @@ const processingInstructions = [
     processNode: processNodeDefinitions.processDefaultNode,
   },
 ];
+const checkSupport = (link: string, node: any) => {
+  //prevent recurring nodes from all having expansion buttons
+  if (node?.next?.parent?.attribs?.href === link) {
+    return false;
+  }
+
+  let imgurRegex = /([A-z.]+\.)?(imgur(\.com))+(\/)+([A-z0-9]){7}\./gm;
+  let redditRegex =
+    /(preview+\.)+(reddit(\.com)|redd(\.it))+(\/[A-z0-9]+)+(\.(png|jpg))\./gm;
+  let greedyRegex = /(\.(png|jpg))/gm;
+  return !!(
+    link.match(imgurRegex) ||
+    link.match(redditRegex) ||
+    link.match(greedyRegex)
+  );
+};
 
 const ErrorFallBack = () => {
   return (
@@ -94,7 +111,7 @@ const ParseBodyHTML = ({
     //     return "";
     //   }
     // };
-    const DOMAIN = window?.location?.host ?? "troddit.com"; 
+    const DOMAIN = window?.location?.host ?? "troddit.com";
 
     const blankTargets = (str) => {
       if (str?.includes("<a ")) {
@@ -170,7 +187,7 @@ const ParseBodyHTML = ({
         }} //alternate to single click fix
         className={
           " prose inline-block prose-a:py-0  prose-headings:font-normal prose-p:my-0 prose-h1:text-xl   " +
-          " prose-strong:text-th-textStrong prose-headings:text-th-textHeading text-th-textBody  prose-a:break-all prose-pre:md:max-w-lg prose-pre:lg:max-w-3xl  prose-pre:overflow-x-auto prose-table:max-w-lg prose-table:lg:max-w-full prose-table:overflow-x-auto break-words  " +
+          " prose-strong:text-th-textStrong prose-headings:text-th-textHeading text-th-textBody  prose-a:break-all prose-pre:max-w-[90vw] prose-pre:md:max-w-lg prose-pre:lg:max-w-3xl  prose-pre:overflow-x-auto prose-table:max-w-[90vw] prose-table:md:max-w-lg prose-table:lg:max-w-full prose-table:overflow-x-auto break-words  " +
           (resolvedTheme == "light" ? " " : " prose-invert  ") +
           (small && card
             ? " prose-sm  "
@@ -180,7 +197,7 @@ const ParseBodyHTML = ({
           (limitWidth ? " max-w-2xl " : " max-w-none")
         }
         style={{
-          wordBreak: "break-word"
+          wordBreak: "break-word",
         }}
       >
         {component}
