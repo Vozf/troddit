@@ -1,25 +1,27 @@
 import "../../styles/globals.css";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
-import { MainProvider } from "../MainContext";
+import { MainProvider, localSeen } from "../MainContext";
 import { MySubsProvider } from "../MySubs";
 import { MyCollectionsProvider } from "../components/collections/CollectionContext";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from "react-query/devtools";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Script from "next/script";
 import Head from "next/head";
 import { Analytics } from "@vercel/analytics/react";
 
 import toast, { Toaster } from "react-hot-toast";
 import NavBar from "../components/NavBar";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import packageInfo from "../../package.json";
 import { checkVersion } from "../../lib/utils";
 import ToastCustom from "../components/toast/ToastCustom";
+import { usePlausible } from "next-plausible";
 
 const VERSION = packageInfo.version;
 const queryClient = new QueryClient();
 function MyApp({ Component, pageProps }) {
+  const plausible = usePlausible();
   useEffect(() => {
     const curVersion = VERSION;
     const prevVersion = localStorage.getItem("trodditVersion");
@@ -30,7 +32,7 @@ function MyApp({ Component, pageProps }) {
           (t) => (
             <ToastCustom
               t={t}
-              message={`Troddit has updated! Click to see changelog`}
+              message={`Troddit updated! Click to see changelog`}
               mode={"version"}
             />
           ),
@@ -39,6 +41,7 @@ function MyApp({ Component, pageProps }) {
       }
     }
     localStorage.setItem("trodditVersion", curVersion);
+    
   }, []);
   return (
     <>
@@ -56,14 +59,14 @@ function MyApp({ Component, pageProps }) {
           <MainProvider>
             <MySubsProvider>
               <MyCollectionsProvider>
-                <QueryClientProvider client={queryClient}>
-                  <NavBar />
-                  <div className="mb-14"></div>
-                  <Component {...pageProps} />
-                  <Toaster position="bottom-center" />
-                  <Analytics />
-                  {/* <ReactQueryDevtools initialIsOpen={false} /> */}
-                </QueryClientProvider>
+                  <QueryClientProvider client={queryClient}>
+                    <NavBar />
+                    <div className="mb-14"></div>
+                    <Component {...pageProps} />
+                    <Toaster position="bottom-center" />
+                    <Analytics />
+                    <ReactQueryDevtools initialIsOpen={false} />
+                  </QueryClientProvider>
               </MyCollectionsProvider>
             </MySubsProvider>
           </MainProvider>
