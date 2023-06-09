@@ -69,7 +69,7 @@ const GalleryCarousel = ({
         renderTopCenterControls={({ currentSlide }) => (
           <div
             className={
-              (media.length < 2 ? "hidden " : "") + 
+              (media.length < 2 ? "hidden " : "") +
               " z-10  md:p-2 text-white text-[10px] md:text-xs bg-black bg-opacity-50 rounded-lg backdrop-blur-lg " +
               (mediaMode
                 ? "fixed bottom-[32.5rem] right-1.5 p-2 md:top-6 md:bottom-auto md:right-24  "
