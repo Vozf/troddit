@@ -78,9 +78,10 @@ const Feed = ({ initialData = {} as any }) => {
     );
   } else {
     toast.remove("not_found");
+    toast.remove("feed_error");
   }
   return (
-    <main>
+    <>
       <LoginModal />
       <div className="flex flex-col items-center flex-none w-screen pt-1">
         <div
@@ -125,7 +126,7 @@ const Feed = ({ initialData = {} as any }) => {
           }
         />
       </button>
-    </main>
+    </>
   );
 };
 
