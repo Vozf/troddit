@@ -737,40 +737,56 @@ export const MySubsProvider = ({ children }) => {
   //removing loadallfast from initial page load. Only loadall when needed
   useEffect(() => {
     if (
+      user.isLoaded &&
+      status !== "loading" &&
       !loadedSubs &&
       (router?.pathname === "/r/[...slug]" ||
         router?.pathname === "/u/[...slug]" ||
         router?.pathname === "/search")
     ) {
-      loadLocalSubs();
-      tryLoadAll();
+      status === "unauthenticated" ? loadLocalSubs() : tryLoadAll();
     }
-  }, [router?.pathname, loadedSubs, user.premium?.isPremium]);
+  }, [
+    router?.pathname,
+    status,
+    loadedSubs,
+    user.isLoaded,
+    user.premium?.isPremium,
+  ]);
   useEffect(() => {
     if (
+      user.isLoaded &&
       router?.pathname === "/r/[...slug]" &&
       router?.query?.slug?.[1] !== "comments" &&
       !loadedSubs
     ) {
       tryLoadAll();
     }
-  }, [router, loadedSubs, user.premium?.isPremium]);
+  }, [
+    router,
+    loadedSubs,
+    user?.isLoaded,
+    user.premium?.isPremium,
+    user.isLoaded,
+  ]);
   const tryLoadAll = () => {
     user?.premium?.isPremium && !loadedSubs && !loadingSubs && loadAllFast();
   };
 
   useEffect(() => {
-    loadLocalSubs();
+    user.isLoaded && status === "unauthenticated" && loadLocalSubs();
     return () => {};
-  }, [context.localSubs, context.localFavoriteSubs]);
+  }, [user.isLoaded, status, context.localSubs, context.localFavoriteSubs]);
 
   useEffect(() => {
-    if (session && mySubs.length == 0) {
-      loadAllFast();
-    } else if (!session && !loading) {
-      loadLocalSubs();
+    if (user.isLoaded) {
+      if (session && mySubs.length == 0) {
+        tryLoadAll();
+      } else if (!session && !loading) {
+        loadLocalSubs();
+      }
     }
-  }, [session, loading]);
+  }, [session, loading, user.isLoaded, user?.premium?.isPremium]);
 
   useEffect(() => {
     mySubs.forEach((sub) => {
@@ -804,16 +820,19 @@ export const MySubsProvider = ({ children }) => {
     }
   };
   useEffect(() => {
-    if (!session && !loading && myLocalSubs.length > 0) {
+    if (user.isLoaded && !session && !loading && myLocalSubs.length > 0) {
       setloadedSubs(true);
     }
-  }, [myLocalSubs, session, loading]);
+  }, [myLocalSubs, session, loading, user.isLoaded]);
 
   const loadUserSubInfos = async (users) => {
     let follows = [];
     await Promise.all([
       ...users.map(async (user) => {
-        const info = await loadSubInfo(user?.data?.subreddit?.display_name);
+        const info = await loadSubInfo({
+          subreddit: user?.data?.subreddit?.display_name,
+          isPremium: user?.premium?.isPremium,
+        });
         info?.kind == "t5"
           ? follows.push({
               ...user,
@@ -837,7 +856,6 @@ export const MySubsProvider = ({ children }) => {
 
   const loadAllFromReddit = async () => {
     try {
-      //console.log('load subs');
       setLoadingSubs(true);
       const multis = getMyMultis({ isPremium: user.premium?.isPremium });
       const all = getAllMyFollows({ isPremium: user.premium?.isPremium });
@@ -873,8 +891,8 @@ export const MySubsProvider = ({ children }) => {
   };
 
   const loadAllFast = async () => {
-    setLoadingSubs(true);
-    if (session?.user?.name) {
+    if (session?.user?.name && user?.premium?.isPremium) {
+      setLoadingSubs(true);
       let username = session.user.name;
       let d = await localForage.getItem("subSync");
       let subs = d?.[username]?.subs;
@@ -893,7 +911,7 @@ export const MySubsProvider = ({ children }) => {
         !(follows?.length > 0) ||
         new Date().getTime() > lastUpdate?.getTime() + 24 * 60 * 60 * 1000
       ) {
-        loadAllFromReddit();
+        await loadAllFromReddit();
       } else {
         setLoadingSubs(false);
         setloadedSubs(true);
