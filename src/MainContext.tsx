@@ -569,7 +569,7 @@ export const MainProvider = ({ children }) => {
         } else {
           fallback = true;
           let local_nsfw = localStorage.getItem("nsfw");
-          local_nsfw?.includes("true") ? setNSFW(true) : setNSFW(false);
+          local_nsfw?.includes("true") ? setNSFW(true) : setNSFW(true);
         }
       };
 
@@ -583,7 +583,7 @@ export const MainProvider = ({ children }) => {
           let local_autoplay = localStorage.getItem("autoplay");
           local_autoplay?.includes("true")
             ? setAutoplay(true)
-            : setAutoplay(false);
+            : setAutoplay(true);
         }
       };
 
@@ -647,7 +647,7 @@ export const MainProvider = ({ children }) => {
           );
           local_columnOverride > 0
             ? setColumnOverride(local_columnOverride)
-            : setColumnOverride(0);
+            : setColumnOverride(33);
         }
       };
 
@@ -745,8 +745,8 @@ export const MainProvider = ({ children }) => {
       };
 
       let filters = {
-        seenFilter: true,
-        readFilter: true,
+        seenFilter: false,
+        readFilter: false,
         imgFilter: true,
         vidFilter: true,
         selfFilter: true,
