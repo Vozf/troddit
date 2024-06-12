@@ -647,7 +647,7 @@ export const MainProvider = ({ children }) => {
           );
           local_columnOverride > 0
             ? setColumnOverride(local_columnOverride)
-            : setColumnOverride(33);
+            : setColumnOverride(3);
         }
       };
 
